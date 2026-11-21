@@ -12,16 +12,11 @@ class VisionAgent:
         self.model = tf.keras.models.load_model(model_path)
 
     def _prepare(self, frame):
-        """Accepts a file path, a PIL image, or a numpy array."""
-        if isinstance(frame, str):
-            img = tf.keras.utils.load_img(frame, target_size=(IMG_SIZE, IMG_SIZE))
-            arr = tf.keras.utils.img_to_array(img)
-        else:
-            arr = np.array(frame, dtype=np.float32)
-            if arr.ndim == 2:  # grayscale -> 3 channels
-                arr = np.stack([arr] * 3, axis=-1)
-            arr = tf.image.resize(arr[..., :3], [IMG_SIZE, IMG_SIZE]).numpy()
-        arr = preprocess_input(arr)  # same scaling as training: [-1, 1]
+        arr = np.array(frame, dtype=np.float32)
+        if arr.ndim == 2:
+            arr = np.stack([arr] * 3, axis=-1)
+        arr = tf.image.resize(arr[..., :3], [IMG_SIZE, IMG_SIZE]).numpy()
+        arr = preprocess_input(arr)
         return np.expand_dims(arr, axis=0)
 
     def analyze(self, frame_features):
